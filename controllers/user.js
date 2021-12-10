@@ -5,7 +5,7 @@ const User = require('../models/user')
 const Book = require('../models/book')
 const path = require('path')
 const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const mongoose = require('mongoose')
 
 const maxAge = 7*24*60*60

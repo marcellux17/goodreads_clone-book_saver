@@ -35,10 +35,10 @@ app.get('*', (req, res) => {
     res.render('404')
 })
 
-mongoose.connect(DB_URL, { useCreateIndex: true, useUnifiedTopology: true, useNewUrlParser: true }).then(res => {
+mongoose.connect(DB_URL).then(res => {
     app.listen(PORT, () => {
         console.log('app listening on port', PORT)
     })
 }).catch(e => {
-    console.log('error connecting to mongodb database')
+    console.log(e)
 })
