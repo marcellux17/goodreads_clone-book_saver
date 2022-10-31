@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+        />
+    <title>Create book</title>
+</head>
+<body>
+    <%- include('../partials/header.ejs') %>
+    <div class="container">
+        <% if(errors){ %>
+            <div class="alert alert-danger mt-3">Error creating book, try again!</div>
+        <% } %>
+        <form action="/books" method="POST" enctype="multipart/form-data">
+            <div class="form-group mt-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" name="title" value="<%= book.title %>" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="author" name="author" value="<%= book.author %>" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea name="description" id="description" style="white-space: pre-wrap;" class="form-control" required><%= book.description %></textarea>
+            </div>
+            <% if(errors.file){ %>
+                <div class="form-group mt-3">
+                    <label for="cover" class="form-label">Cover</label>
+                    <input type="file" name="cover" class="form-control is-invalid" required>
+                    <div class="invalid-feedback"><%= errors.file %></div>
+                </div>
+            <% }else{ %>
+                <div class="form-group mt-3">
+                    <label for="cover" class="form-label">Cover</label>
+                    <input type="file" name="cover" class="form-control" required>
+                </div>
+            <% } %>
+            <button class="btn btn-primary mt-3" type="submit">Submit</button>
+        </form>
+    </div>
+    <script>
+        const alert = document.querySelector('div.alert-danger')
+        setTimeout(() => {
+            if(alert){
+                alert.remove()
+            }
+        }, 4000)
+    </script>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+        ></script>
+</body>
+</html>

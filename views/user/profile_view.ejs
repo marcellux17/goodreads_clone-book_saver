@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <title>Profile</title>
+</head>
+<body>
+    <%- include('../partials/header.ejs') %>
+    <div class="container">
+        <% if(errors.password){ %>
+            <div role="alert" class="alert alert-danger mt-3">Error deleting account!</div>
+        <% } %>
+        <div class="d-flex justify-content-center my-4">
+            <img src="<%= `/images/profile/resized/${user.profilePic}` %>" alt="profile pic">
+            <div class="d-flex flex-column align-items-start mx-3">
+                <div>
+                    <p><span class="fw-bold">Email </span><span class="d-inline ms-4"><%= user.email %></span></p>
+                </div>
+                <div>
+                    <p><span class="fw-bold">Username </span><span class="d-inline ms-4"><%= user.username %></span></p>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-danger btn-sm mx-auto d-block" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal">Delete profile</button>
+
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Are you sure you want to delete your account?</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/user?_method=DELETE" method="POST">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" class="form-control"  id="password" required>
+                        </div>
+                        <button class="btn btn-danger my-3">Delete</button>
+                    </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        <hr>
+        <form action="/user/add_shelf" method="POST" class="mb-3">
+            <% if(errors.shelf){ %>
+                <label for="shelf">Shelf</label>
+                <input type="text" required id="shelf" class="form-control is-invalid" name="shelf">
+                <div class="invalid-feedback"><%= errors.shelf %></div>
+            <% }else{ %>
+                <label for="shelf">Shelf</label>
+                <input type="text" required id="shelf" class="form-control" name="shelf">
+            <% }%>
+            <button class="btn btn-sm btn-secondary mt-2">Add shelf</button>
+        </form>
+        <h3 class="text-center">My shelves</h3>
+        <% if(user.shelves.length){ %>
+            <ul class="nav nav-tabs shelves-nav">
+            <% user.shelves.forEach((s, i) => { %>
+                <% if(i === 0){ %>
+                    <li class="nav-item nav-link active" data-shelf="<%= s.name %>"><%= s.name %></li>
+                <% }else{%>
+                    <li class="nav-item nav-link" data-shelf="<%= s.name %>"><%= s.name %></li>
+                <% } %>
+            <% }) %>
+            </ul>
+            <div class="books d-flex flex-column align-items-center my-4 shelves-item-container">
+                <% user.shelves.forEach((s, i) => {%>
+                    <% if(i === 0){%>
+                        <div data-shelf="<%= s.name %>" class="shelf">
+                            <% s.books.forEach(book => { %>
+                                <div class="rounded shadow py-2 px-3 d-flex flex-column flex-sm-row p-3 my-1 my-sm-3 position-relative" >
+                                    <img src="<%= `/images/books/resized/${book.cover}` %>" alt="book cover" class="mx-4 align-self-center" style="height: 180px; width: 120px;">
+                                    <div class="d-flex flex-column">
+                                        <h3>
+                                            <%= book.title %>
+                                        </h3>
+                                        <h5 class="text-muted">
+                                            <%= book.author %>
+                                        </h5>
+                                        <div style="overflow: hidden; width: 300px; height: 100px; line-height: 1.3;">
+                                            <%= book.description %>
+                                        </div>
+                                        <a href="<%= `/books/${book._id}` %>" class="btn btn-info btn-sm mt-1" role="button">View more</a>
+                                        <form action="<%= `/user/delete_book?bookId=${book._id}&shelfId=${s._id}&_method=DELETE` %>" class="position-absolute top-0 end-0 m-2" method="POST">
+                                            <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% }) %>
+                            <form action="<%= `/user/delete_shelf/${s._id}?_method=DELETE` %>" method="POST">
+                                <button class="btn btn-sm btn-danger">Delete shelf</button>
+                            </form>
+                        </div>
+                    <%}else{ %>
+                        <div data-shelf="<%= s.name %>" class="shelf d-none">
+                            <% s.books.forEach(book => { %>
+                                <div class="rounded shadow py-2 px-3 d-flex flex-column flex-sm-row p-3 my-1 my-sm-3 position-relative" data-shelf="<%= s.name %>">
+                                    <img src="<%= `/images/books/resized/${book.cover}` %>" alt="book cover" class="mx-4 align-self-center" style="height: 180px; width: 120px;">
+                                    <div class="d-flex flex-column">
+                                        <h3>
+                                            <%= book.title %>
+                                        </h3>
+                                        <h5 class="text-muted">
+                                            <%= book.author %>
+                                        </h5>
+                                        <div style="overflow: hidden; width: 300px; height: 100px; line-height: 1.3;">
+                                            <%= book.description %>
+                                        </div>
+                                        <a href="<%= `/books/${book._id}` %>" class="btn btn-info btn-sm mt-1" role="button">View more</a>
+                                        <form action="<%= `/user/delete_book?bookId=${book._id}&shelfId=${s._id}&_method=DELETE` %>" class="position-absolute top-0 end-0 m-2" method="POST">
+                                            <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <% }) %>
+                            <form action="<%= `/user/delete_shelf/${s._id}?_method=DELETE` %>" method="POST">
+                                <button class="btn btn-sm btn-danger">Delete shelf</button>
+                            </form>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+    <script>
+        const alert = document.querySelector('.alert-danger')
+        const shelvesNav = document.querySelector('.shelves-nav')
+        const navLinks = shelvesNav.querySelectorAll('li.nav-item')
+        const shelvesItemContainer = document.querySelector('.shelves-item-container')
+        setTimeout(() => {
+            if(alert){
+                alert.remove()
+            }
+        }, 4000)
+        if(shelvesNav){
+            Array.from(navLinks).forEach(navLink => {
+                navLink.addEventListener('click', e => {
+                    navLink.classList.add('active')
+                    const shelfName = navLink.dataset.shelf
+                    Array.from(navLinks).forEach(nl => {
+                        if(nl !== navLink){
+                            nl.classList.remove('active')
+                        }
+                    })
+                    Array.from(shelvesItemContainer.querySelectorAll('div.shelf')).forEach(shelf => {
+                        if(shelf.dataset.shelf !== shelfName){
+                            shelf.classList.add('d-none')
+                        }else{
+                            shelf.classList.remove('d-none')
+                        }
+                    })
+                })
+            })
+        }
+    </script>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+        ></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+        />
+    <title>Book</title>
+</head>
+<body>
+    <%- include('../partials/header.ejs') %>
+    <div class="container">
+        <div class="d-flex my-4">
+            <img src="<%= `/images/books/resized/${book.cover}` %>" alt="book cover" style="height: 180px; width: 120px;">
+            <div class="mx-3 d-flex flex-column">
+                <h2>
+                    <%= book.title  %> 
+                </h2>
+                <h4 class="text-muted">
+                    <%= book.author %>
+                </h4>
+                <p style="white-space: pre-wrap;"><%= book.description %></p>
+            </div>
+        </div>
+        <hr>
+        <% if(locals.is_review){ %>
+            <div class="accordion my-3" id="accordionExample">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Leave a review
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form action="<%= `/books/review/${book._id}` %>" method="POST" class="my-3">
+                            <div class="form-group mt-2">
+                                <label for="rating">Your rating</label>
+                                <h5 id="ratingOp" class="text-center my-1">5</h5>
+                                <input type="range" min="1" max="5" name="rating" id="rating" class="form-range" value="5">
+                            </div>
+                            <div class="form-group mt-2">
+                                <label for="review">Your review</label>
+                                <textarea name="review" id="review"  class="form-control mt-1"></textarea>
+                            </div>
+                            <button class="btn btn-secondary btn-md my-2" type="submit">Send</button>
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+        <% } %>
+        <% if(locals._user && locals._user.shelves.length){ %>
+            <form action="<%= `/user/add_book/${book._id}` %>" method="POST">
+                
+                <label for="shelf" class="form-label">Add book to shelf</label>
+                <select name="shelf" id="shelf" class="form-select">
+                    <% _user.shelves.forEach(s => { %>
+                        <option value="<%= s.name %>"><%= s.name %></option>
+                    <%})%>
+                </select>
+                <button class="btn btn-secondary bnt-sm mt-3">Add to shelf</button>
+            </form>
+        <% } %>
+        <h3 class="text-center">Reviews</h3>
+        <div>
+            <% book.reviews.forEach(r => { %>
+                <div class="d-flex shadow rounded p-3 mt-2">
+                    <div class="d-flex flex-column">
+                        <img src="<%= `/images/profile/resized/${r.reviewer.profilePic}` %>" alt="profile picture" class="mx-4 align-self-center" style="height: 60px; width: 50px;">
+                        <p class="muted text-center mt-3"><%= r.createdAt.toLocaleDateString() %></p>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <h5><%= r.rating %></h5>
+                        <p style="white-space: pre-wrap;"><%= r.review %></p>
+                        <br>
+                        <p><%= r.reviewer.email %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"
+        ></script>
+    <script>
+        const ratingInput = document.querySelector('#rating')
+        const ratingOutput = document.querySelector('#ratingOp')
+        if(ratingInput){
+            ratingInput.addEventListener('input', e => {
+                ratingOutput.textContent = ratingInput.value
+            })
+        }
+    </script>
+</body>
+</html>
